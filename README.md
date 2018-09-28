@@ -7,6 +7,7 @@ This exporter provides metrics for the devices defined in Domoticz, rather than 
 ## Arguments
 
     --port     9486         Exporter listens on this port (default = 9486)
+    --interval 15           Polling interval in seconds (default = 15, minimum 2)
     --hostip   127.0.0.1    Domoticz IP (default = 127.0.0.1)
     --hostport 8080         Domoticz port (default = 8080, or 443 if using SSL)
     --hostssl               Use SSL to connect to Domoticz
@@ -16,10 +17,11 @@ This exporter provides metrics for the devices defined in Domoticz, rather than 
 
 The arguments can also be set as env variables instead. Useful if you're using it in a Docker container.
 1. DOMOTICZ_PORT
-2. DOMOTICZ_HOSTIP
-3. DOMOTICZ_HOSTPORT
-3. DOMOTICZ_HOSTSSL
-4. DOMOTICZ_DEFAULTMETRICS
+2. DOMOTICZ_INTERVAL
+3. DOMOTICZ_HOSTIP
+4. DOMOTICZ_HOSTPORT
+5. DOMOTICZ_HOSTSSL
+6. DOMOTICZ_DEFAULTMETRICS
 
 # Installation
 

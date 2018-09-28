@@ -14,12 +14,17 @@ const labelNames = ['name','idx','type','subtype','hardwarename','hardwaretype',
 // Get args and set options
 const argOptions = commandLineArgs([
     { name: 'port', alias: 'p', type: Number, defaultValue: process.env.DOMOTICZ_PORT || 9486, },
+    { name: 'interval', alias: 'i', type: Number, defaultValue: process.env.DOMOTICZ_INTERVAL || 15, },
     { name: 'hostip', type: String, defaultValue: process.env.DOMOTICZ_HOSTIP || '127.0.0.1', },
     { name: 'hostport', type: Number, defaultValue: process.env.DOMOTICZ_HOSTPORT || 8080, },
     { name: 'hostssl', type: Boolean, },
     { name: 'collectdefault', type: Boolean, },
 ]);
 const port = argOptions.port;
+const interval = argOptions.interval;
+if (interval < 2) {
+    interval = 2;
+}
 const domoticzIP = argOptions.hostip;
 const domoticzPort = argOptions.hostport;
 const domoticzSsl = process.env.DOMOTICZ_HOSTSSL || argOptions.hostssl;
@@ -119,6 +124,10 @@ if (collectDefaultMetrics) {
     });
 }
 
+// Start gathering metrics
+gatherMetrics();
+setInterval(gatherMetrics, interval * 1000);
+
 // Start Server.
 console.log(`INFO: Starting HTTP server...`);
 const server = http.createServer((req, res) => {
@@ -128,9 +137,7 @@ const server = http.createServer((req, res) => {
         return res.end('Support GET only');
     }
     res.setHeader('Content-Type', register.contentType);
-    gatherMetrics().then(() => {
-        res.end(register.metrics());
-    });
+    res.end(register.metrics());
 }).listen(port);
 server.setTimeout(30000);
 console.log(`INFO: Domoticz exporter listening on port ${port}`);
@@ -179,89 +186,89 @@ function getLabels(device) {
 // Main function to get the metrics for each container
 async function gatherMetrics() {
     try {
-        // Reset all to zero before proceeding
-        register.resetMetrics();
-
         // Get all device type in parallel 
         let lightsPromise = fetchDevices({ type: 'light' });
         let tempsPromise = fetchDevices({ type: 'temp' });
         let weathersPromise = fetchDevices({ type: 'weather' });
         let utilitiesPromise = fetchDevices({ type: 'utility' });
+        let lights = await lightsPromise;
+        let temps = await tempsPromise;
+        let weathers = await weathersPromise;
+        let utilities = await utilitiesPromise;
+
+        // Reset all to zero before proceeding
+        register.resetMetrics();
 
         // process light metrics
-        let lights = await lightsPromise;
         if (lights.result && Array.isArray(lights.result) && lights.result.length) {
             for (let device of lights.result) {
                 const labels = getLabels(device);
-                if (device.Level) {
+                if (device.Level !== undefined && !isNaN(device.Level)) {
                     gaugeLightLevel.set(labels, device.Level);
                 }
-                if (device.Status) {
+                if (device.Status !== undefined) {
                     gaugeLightStatus.set(labels, device.Status.toUpperCase() == 'ON' ? 1 : 0);
                 }
-                if (device.BatteryLevel) {
+                if (device.BatteryLevel !== undefined && !isNaN(device.BatteryLevel)) {
                     gaugeLightBatteryLevel.set(labels, device.BatteryLevel);
                 }
             }
         }
 
         // process temp metrics
-        let temps = await tempsPromise;
         if (temps.result && Array.isArray(temps.result) && temps.result.length) {
             for (let device of temps.result) {
                 const labels = getLabels(device);
-                if (device.Temp) {
+                if (device.Temp !== undefined && !isNaN(device.Temp)) {
                     gaugeTempTemp.set(labels, device.Temp);
                 }
-                if (device.Humidity) {
+                if (device.Humidity !== undefined && !isNaN(device.Humidity)) {
                     gaugeTempHumidity.set(labels, device.Humidity);
                 }
-                if (device.BatteryLevel) {
+                if (device.BatteryLevel !== undefined && !isNaN(device.BatteryLevel)) {
                     gaugeTempBatteryLevel.set(labels, device.BatteryLevel);
                 }
             }
         }
 
         // process weather metrics
-        let weathers = await weathersPromise;
         if (weathers.result && Array.isArray(weathers.result) && weathers.result.length) {
             for (let device of weathers.result) {
                 const labels = getLabels(device);
-                if (device.Temp) {
+                if (device.Temp !== undefined && !isNaN(device.Temp)) {
                     gaugeWeatherTemp.set(labels, device.Temp);
                 }
-                if (device.Humidity) {
+                if (device.Humidity !== undefined && !isNaN(device.Humidity)) {
                     gaugeWeatherHumidity.set(labels, device.Humidity);
                 }
-                if (device.Barometer) {
+                if (device.Barometer !== undefined && !isNaN(device.Barometer)) {
                     gaugeWeatherBarometer.set(labels, device.Barometer);
                 }
-                if (device.BatteryLevel) {
+                if (device.BatteryLevel !== undefined && !isNaN(device.BatteryLevel)) {
                     gaugeWeatherBatteryLevel.set(labels, device.BatteryLevel);
                 }
             }
         }
 
         // process utility metrics
-        let utilities = await utilitiesPromise;
         if (utilities.result && Array.isArray(utilities.result) && utilities.result.length) {
             for (let device of utilities.result) {
                 const labels = getLabels(device);
-                if (device.Data) {
+                if (device.Data !== undefined) {
                     // convert data to purely a number
                     let data = parseFloat(device.Data.replace(/[^\d.-]/g, ''));
-                    if (data) {
+                    if (!isNaN(data)) {
                         gaugeUtilityData.set(labels, data);
                     }
                 }
-                if (device.Usage) {
+                if (device.Usage !== undefined) {
                     // convert data to purely a number
                     let data = parseFloat(device.Usage.replace(/[^\d.-]/g, ''));
-                    if (data) {
+                    if (!isNaN(data)) {
                         gaugeUtilityUsage.set(labels, data);
                     }
                 }
-                if (device.BatteryLevel) {
+                if (device.BatteryLevel !== undefined && !isNaN(device.BatteryLevel)) {
                     gaugeUtilityBatteryLevel.set(labels, device.BatteryLevel);
                 }
             }
