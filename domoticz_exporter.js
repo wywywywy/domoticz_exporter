@@ -84,6 +84,11 @@ const gaugeUtilityData = new prom.Gauge({
     'help': 'Utility device data',
     'labelNames': labelNames,
 });
+const gaugeUtilityUsage = new prom.Gauge({
+    'name': appName + '_utility_usage',
+    'help': 'Utility device usage',
+    'labelNames': labelNames,
+});
 const gaugeUtilityBatteryLevel = new prom.Gauge({
     'name': appName + '_utility_battery_level',
     'help': 'Utility device battery level 0-100 or 0-255',
@@ -104,6 +109,7 @@ register.registerMetric(gaugeWeatherHumidity);
 register.registerMetric(gaugeWeatherBarometer);
 register.registerMetric(gaugeWeatherBatteryLevel);
 register.registerMetric(gaugeUtilityData);
+register.registerMetric(gaugeUtilityUsage);
 register.registerMetric(gaugeUtilityBatteryLevel);
 if (collectDefaultMetrics) {
     prom.collectDefaultMetrics({
@@ -246,6 +252,13 @@ async function gatherMetrics() {
                     let data = parseFloat(device.Data.replace(/[^\d.-]/g, ''));
                     if (data) {
                         gaugeUtilityData.set(labels, data);
+                    }
+                }
+                if (device.Usage) {
+                    // convert data to purely a number
+                    let data = parseFloat(device.Usage.replace(/[^\d.-]/g, ''));
+                    if (data) {
+                        gaugeUtilityUsage.set(labels, data);
                     }
                 }
                 if (device.BatteryLevel) {
