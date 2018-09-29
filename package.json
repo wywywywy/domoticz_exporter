@@ -18,6 +18,7 @@
   "homepage": "https://github.com/wywywywy/domoticz_exporter#readme",
   "dependencies": {
     "command-line-args": "^5.0.2",
+    "moment": "^2.22.2",
     "node-fetch": "^2.2.0",
     "prom-client": "^11.1.3"
   }

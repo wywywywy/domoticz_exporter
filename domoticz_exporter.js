@@ -6,10 +6,12 @@ const http = require('http');
 const fetch = require("node-fetch");
 const prom = require('prom-client');
 const commandLineArgs = require('command-line-args')
+const moment = require('moment');
 
 // Constants
 const appName = 'domoticz';
 const labelNames = ['name','idx','type','subtype','hardwarename','hardwaretype',];
+const _debug = process.env.DEBUG;
 
 // Get args and set options
 const argOptions = commandLineArgs([
@@ -21,12 +23,12 @@ const argOptions = commandLineArgs([
     { name: 'collectdefault', type: Boolean, },
 ]);
 const port = argOptions.port;
-const interval = argOptions.interval;
+let interval = argOptions.interval;
 if (interval < 2) {
     interval = 2;
 }
 const domoticzIP = argOptions.hostip;
-const domoticzPort = argOptions.hostport;
+let domoticzPort = argOptions.hostport;
 const domoticzSsl = process.env.DOMOTICZ_HOSTSSL || argOptions.hostssl;
 if (domoticzSsl) {
     domoticzPort = 443;
@@ -136,8 +138,9 @@ const server = http.createServer((req, res) => {
         res.writeHead(404, { 'Content-Type': 'text/html' });
         return res.end('Support GET only');
     }
+    debug('GET request recevied');
     res.setHeader('Content-Type', register.contentType);
-    res.end(register.metrics());
+    return res.end(register.metrics());
 }).listen(port);
 server.setTimeout(30000);
 console.log(`INFO: Domoticz exporter listening on port ${port}`);
@@ -162,8 +165,10 @@ async function fetchDevices({
     type,
 }) {
     try {
+        debug(`Devices of type ${type} requested`);
         let response = await fetch(buildUrl({ ssl: domoticzSsl, ip: domoticzIP, port: domoticzPort, type: type }));
         let json = await response.json();
+        debug(`Devices of type ${type} received`);
         return json;
     } catch (err) {
         console.log('ERROR: Unable to connect to Domoticz.  Check IP and port.');
@@ -213,6 +218,7 @@ async function gatherMetrics() {
                     gaugeLightBatteryLevel.set(labels, device.BatteryLevel);
                 }
             }
+            debug(`Lights = ${lights.result.length}`);
         }
 
         // process temp metrics
@@ -229,6 +235,7 @@ async function gatherMetrics() {
                     gaugeTempBatteryLevel.set(labels, device.BatteryLevel);
                 }
             }
+            debug(`Temps = ${temps.result.length}`);
         }
 
         // process weather metrics
@@ -248,6 +255,7 @@ async function gatherMetrics() {
                     gaugeWeatherBatteryLevel.set(labels, device.BatteryLevel);
                 }
             }
+            debug(`Weathers = ${weathers.result.length}`);
         }
 
         // process utility metrics
@@ -272,6 +280,7 @@ async function gatherMetrics() {
                     gaugeUtilityBatteryLevel.set(labels, device.BatteryLevel);
                 }
             }
+            debug(`Utilities = ${utilities.result.length}`);
         }
 
     } catch (err) {
@@ -279,3 +288,8 @@ async function gatherMetrics() {
     }
 }
 
+function debug(msg) {
+    if (_debug) {
+        console.log(`DEBUG: ${moment().format('YYYYMMDD-HHmmss')} ${msg}`);
+    }
+}
