@@ -19,7 +19,7 @@
   "dependencies": {
     "command-line-args": "^5.0.2",
     "moment": "^2.22.2",
-    "node-fetch": "^2.2.0",
+    "node-fetch": "^2.6.1",
     "prom-client": "^11.1.3"
   }
 }
