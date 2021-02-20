@@ -2,6 +2,7 @@
 'use strict';
 
 // Requirements
+require('dotenv').config()
 const http = require('http');
 const fetch = require("node-fetch");
 const prom = require('prom-client');
@@ -10,7 +11,7 @@ const moment = require('moment');
 
 // Constants
 const appName = 'domoticz';
-const labelNames = ['name','idx','type','subtype','hardwarename','hardwaretype',];
+const labelNames = ['name', 'idx', 'type', 'subtype', 'hardwarename', 'hardwaretype',];
 const _debug = process.env.DEBUG;
 
 // Get args and set options
@@ -138,7 +139,7 @@ const server = http.createServer((req, res) => {
         res.writeHead(404, { 'Content-Type': 'text/html' });
         return res.end('Support GET only');
     }
-    debug('GET request recevied');
+    debug('GET request received');
     res.setHeader('Content-Type', register.contentType);
     return res.end(register.metrics());
 }).listen(port);
@@ -212,7 +213,7 @@ async function gatherMetrics() {
                     gaugeLightLevel.set(labels, device.Level);
                 }
                 if (device.Status !== undefined) {
-                    gaugeLightStatus.set(labels, (device.Status.toUpperCase() == 'ON' || device.Status.toUpperCase() == 'OPEN')? 1 : 0);
+                    gaugeLightStatus.set(labels, (device.Status.toUpperCase() == 'ON' || device.Status.toUpperCase() == 'OPEN') ? 1 : 0);
                 }
                 if (device.BatteryLevel !== undefined && !isNaN(device.BatteryLevel)) {
                     gaugeLightBatteryLevel.set(labels, device.BatteryLevel);
