@@ -1,6 +1,6 @@
 {
   "name": "domoticz_exporter",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Domoticz exporter for Prometheus.io",
   "main": "domoticz_exporter.js",
   "scripts": {
@@ -17,9 +17,10 @@
   },
   "homepage": "https://github.com/wywywywy/domoticz_exporter#readme",
   "dependencies": {
-    "command-line-args": "^5.0.2",
-    "moment": "^2.22.2",
+    "command-line-args": "^5.1.1",
+    "dotenv": "^8.2.0",
+    "moment": "^2.29.1",
     "node-fetch": "^2.6.1",
-    "prom-client": "^11.1.3"
+    "prom-client": "^11.5.3"
   }
 }
