@@ -212,7 +212,7 @@ async function gatherMetrics() {
                     gaugeLightLevel.set(labels, device.Level);
                 }
                 if (device.Status !== undefined) {
-                    gaugeLightStatus.set(labels, device.Status.toUpperCase() == 'ON' ? 1 : 0);
+                    gaugeLightStatus.set(labels, (device.Status.toUpperCase() == 'ON' || device.Status.toUpperCase() == 'OPEN')? 1 : 0);
                 }
                 if (device.BatteryLevel !== undefined && !isNaN(device.BatteryLevel)) {
                     gaugeLightBatteryLevel.set(labels, device.BatteryLevel);
