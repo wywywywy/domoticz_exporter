@@ -1,4 +1,4 @@
-Domoticz exporter for Prometheus.io, written in Node.js 8.
+Domoticz exporter for Prometheus.io, written in Node.js 12.
 
 This exporter provides metrics for the devices defined in Domoticz, rather than for Domoticz itself.
 
