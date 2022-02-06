@@ -1,4 +1,4 @@
-Domoticz exporter for Prometheus.io, written in Node.js 12.
+Domoticz exporter for Prometheus.io, written in Node.js 14.
 
 This exporter provides metrics for the devices defined in Domoticz, rather than for Domoticz itself.
 
@@ -27,7 +27,7 @@ The arguments can also be set as env variables instead. Useful if you're using i
 
 ## From Source
 
-Node 8 is required to run it.
+Node 14 is required to run it.
 
     git clone git@github.com:wywywywy/domoticz_exporter.git
     cd domoticz_exporter
