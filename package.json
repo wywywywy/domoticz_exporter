@@ -19,7 +19,7 @@
   "dependencies": {
     "command-line-args": "^5.2.1",
     "dotenv": "^16.0.0",
-    "moment": "^2.29.1",
+    "moment": "^2.29.4",
     "node-fetch": "^2.6.7",
     "prom-client": "^12.0.0"
   }
