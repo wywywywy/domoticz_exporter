@@ -133,7 +133,7 @@ setInterval(gatherMetrics, interval * 1000);
 
 // Start Server.
 console.log(`INFO: Starting HTTP server...`);
-const server = http.createServer((req, res) => {
+const server = http.createServer(async (req, res) => {
     // Only allowed to poll prometheus metrics.
     if (req.method !== 'GET') {
         res.writeHead(404, { 'Content-Type': 'text/html' });
@@ -141,7 +141,7 @@ const server = http.createServer((req, res) => {
     }
     debug('GET request received');
     res.setHeader('Content-Type', register.contentType);
-    return res.end(register.metrics());
+    return res.end(await register.metrics());
 }).listen(port);
 server.setTimeout(30000);
 console.log(`INFO: Domoticz exporter listening on port ${port}`);
@@ -158,7 +158,7 @@ function buildUrl({
         port = 443;
         protocol = 'https://'
     }
-    return protocol + ip + ':' + port + '/json.htm?type=devices&filter=' + type + '&used=true&order=Name'
+    return protocol + ip + ':' + port + '/json.htm?type=command&param=getdevices&filter=' + type + '&used=true&order=Name'
 }
 
 // Get all devices of a particular device type from Domoticz
