@@ -1,4 +1,4 @@
-Domoticz exporter for Prometheus.io, written in Node.js 14.
+Domoticz exporter for Prometheus.io, written in Node.js.
 
 This exporter provides metrics for the devices defined in Domoticz, rather than for Domoticz itself.
 
@@ -16,6 +16,7 @@ This exporter provides metrics for the devices defined in Domoticz, rather than 
 ## Environment Variables
 
 The arguments can also be set as env variables instead. Useful if you're using it in a Docker container.
+
 1. DOMOTICZ_PORT
 2. DOMOTICZ_INTERVAL
 3. DOMOTICZ_HOSTIP
@@ -27,7 +28,7 @@ The arguments can also be set as env variables instead. Useful if you're using i
 
 ## From Source
 
-Node 14 is required to run it.
+Node 16+ is required to run it.
 
     git clone git@github.com:wywywywy/domoticz_exporter.git
     cd domoticz_exporter
@@ -59,9 +60,9 @@ There are 4 types of devices in Domoticz, and they are presented as separate met
 3. temp = Get all temperature devices
 4. utility = Get all utility devices
 
-Unfortunately there is no standard in Domoticz how "levels" are presented.  So for example on some devices battery level 100 means full, and others it will be 255.
+Unfortunately there is no standard in Domoticz how "levels" are presented. So for example on some devices battery level 100 means full, and others it will be 255.
 
-The same goes for units - on some it may be Celsius others Fahrenheit, some it may be kWh others Ah, etc.  It all depends on the device itself.
+The same goes for units - on some it may be Celsius others Fahrenheit, some it may be kWh others Ah, etc. It all depends on the device itself.
 
 # TODO
 
